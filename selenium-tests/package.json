@@ -1,0 +1,11 @@
+{
+  "name": "hackforge-selenium-tests",
+  "private": true,
+  "description": "Browser tests for Trust Juggler using Selenium WebDriver",
+  "scripts": {
+    "test": "node --test --test-concurrency=1"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.27.0"
+  }
+}

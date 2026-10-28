@@ -6,3 +6,8 @@ data
 model
 node_modules
 web
+.venv
+dist
+selenium-tests
+model_out
+.env

@@ -1,4 +1,7 @@
-# docker compose up --build        -> API on http://localhost:8000/docs, PostgreSQL behind it
+# docker compose up -d --build
+#   web  -> http://localhost:8081        (React app, Nginx)
+#   api  -> http://localhost:8000/docs   (FastAPI)
+#   db   -> PostgreSQL, only reachable by the api container
 services:
   db:
     image: postgres:16-alpine
@@ -6,8 +9,6 @@ services:
       POSTGRES_USER: tj
       POSTGRES_PASSWORD: tj
       POSTGRES_DB: tj
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -18,16 +19,30 @@ services:
 
   api:
     build: .
+    image: hackforge-api:latest
     environment:
       DATABASE_URL: postgresql+psycopg://tj:tj@db:5432/tj
       TJ_RESET_ON_START: "true"
       TJ_LAB_RIDERS: "60"
       TJ_CORS_ORIGINS: "*"
+      # demo accounts so the Selenium tests can sign in (development only)
+      TJ_SEED_DEMO_ACCOUNTS: "true"
+      TJ_DEMO_PASSWORD: demo-pass-123
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: hackforge-web:latest
+    ports:
+      - "8081:80"
+    depends_on:
+      - api
 
 volumes:
   pgdata:
